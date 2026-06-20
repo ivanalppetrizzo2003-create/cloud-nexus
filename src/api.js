@@ -54,7 +54,20 @@ export const fetchHfSpaces = async () => {
       headers: getHeaders('hf') 
     });
     if (!spacesRes.ok) throw new Error('Failed to fetch HF spaces');
-    return await spacesRes.json();
+    const spaces = await spacesRes.json();
+    
+    // 3. Fetch detailed status for each space to get runtime.stage
+    const detailedSpaces = await Promise.all(spaces.map(async (space) => {
+      try {
+        const detailRes = await fetch(`https://huggingface.co/api/spaces/${space.id}`, { headers: getHeaders('hf') });
+        if (detailRes.ok) {
+          const detailData = await detailRes.json();
+          return { ...space, runtime: detailData.runtime };
+        }
+      } catch (e) {}
+      return space;
+    }));
+    return detailedSpaces;
   } catch (error) {
     console.error(error);
     return [];
