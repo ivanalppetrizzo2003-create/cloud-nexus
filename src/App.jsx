@@ -51,6 +51,12 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [ready, setReady] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
+  const [toast, setToast] = useState(null);
+
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
 
   const [repos, setRepos] = useState([]);
   const [deployments, setDeployments] = useState([]);
@@ -81,13 +87,13 @@ export default function App() {
   };
 
   const handleRestartSpace = async (spaceId) => {
-    alert(`Sending restart command to ${spaceId}...`);
+    showToast(`正在发送唤醒指令到 ${spaceId.split('/')[1]}...`);
     const success = await restartHfSpace(spaceId);
     if(success) {
-      alert('Restart initiated!');
+      showToast('唤醒成功！云端正在启动，请等待状态变为 RUNNING。');
       loadAllData(); // reload status
     } else {
-      alert('Failed to restart space. Check your token permissions.');
+      showToast('唤醒失败，请检查密钥权限。');
     }
   };
 
@@ -100,6 +106,11 @@ export default function App() {
 
   return (
     <div className="nexus-container">
+      {toast && (
+        <div style={{ position: 'fixed', top: '20px', left: '50%', transform: 'translateX(-50%)', background: 'var(--accent)', color: 'white', padding: '10px 20px', borderRadius: '8px', zIndex: 9999, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+          {toast}
+        </div>
+      )}
       {showSettings && <SettingsModal onSave={handleSaveSettings} onClose={() => setShowSettings(false)} isReady={ready} />}
       
       <aside className="nexus-sidebar">
