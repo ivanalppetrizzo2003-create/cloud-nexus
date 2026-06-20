@@ -183,7 +183,7 @@ export default function App() {
               <div className="card-grid">
                 {spaces.map(space => {
                   const status = space.runtime?.stage || 'SLEEPING';
-                  const appUrl = `https://${space.id.replace('/', '-')}.hf.space`;
+                  const appUrl = `https://${space.id.replace('/', '-').replace(/_/g, '-').toLowerCase()}.hf.space`;
                   return (
                   <div className="item-card" key={space._id}>
                     <div className="item-title">
